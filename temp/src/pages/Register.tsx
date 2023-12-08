@@ -1,7 +1,8 @@
 import React, {SyntheticEvent, useState} from 'react';
-import {Redirect} from "react-router-dom";
+import {Navigate } from 'react-router-dom';
 
-const Login = (props: { setName: (name: string) => void }) => {
+const Register = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
@@ -9,29 +10,32 @@ const Login = (props: { setName: (name: string) => void }) => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        const response = await fetch('http://localhost:8000/api/user/login', {
+        const res = await fetch('http://localhost:8000/api/user/register', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
             body: JSON.stringify({
+                name,
                 email,
                 password
             })
         });
-
-        const content = await response.json();
+        console.log(res);
 
         setRedirect(true);
-        props.setName(content.name);
     }
 
     if (redirect) {
-        return <Redirect to="/"/>;
+        return <Navigate to="/login"/>;
     }
 
     return (
         <form onSubmit={submit}>
-            <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+            <h1 className="h3 mb-3 fw-normal">Please register</h1>
+
+            <input className="form-control" placeholder="Name" required
+                   onChange={e => setName(e.target.value)}
+            />
+
             <input type="email" className="form-control" placeholder="Email address" required
                    onChange={e => setEmail(e.target.value)}
             />
@@ -40,9 +44,9 @@ const Login = (props: { setName: (name: string) => void }) => {
                    onChange={e => setPassword(e.target.value)}
             />
 
-            <button className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            <button className="w-100 btn btn-lg btn-primary" type="submit">Submit</button>
         </form>
     );
 };
 
-export default Login;
+export default Register;

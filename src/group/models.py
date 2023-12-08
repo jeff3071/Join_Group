@@ -18,3 +18,4 @@ class Group(models.Model):
     longitude = models.FloatField(null=True)
     location = models.PointField(null=True)
     address = models.CharField(max_length=100)
+    joiner = models.ManyToManyField(User, related_name='joiner')
