@@ -14,16 +14,22 @@ interface Group {
 
 const Home = (props: { name: string }) => {
     const [groups, setGroups] = useState<Group[]>([]);
+    const [page, setPage] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/group/list_group', {
+                const response = await fetch('http://127.0.0.1:8000/api/group/list_group', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
+                    body: JSON.stringify({
+                        page,
+                    }),
                 });
 
                 const data = await response.json();
+                console.log(data);
                 setGroups(data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -49,7 +55,6 @@ const Home = (props: { name: string }) => {
                                 <p>User: {group.user}</p>
                                 <p>Starting Time: {group.starting_time}</p>
                                 <p>Ending Time: {group.ending_time}</p>
-                                <p>Group Type: {group.group_type}</p>
                                 <p>Address: {group.address}</p>
                                 <p>Latitude: {group.latitude}</p>
                                 <p>Longitude: {group.longitude}</p>

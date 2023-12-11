@@ -1,15 +1,15 @@
 import React, {SyntheticEvent, useState} from 'react';
-import {Navigate } from "react-router-dom";
+import {Navigate} from "react-router-dom";
 
 const Login = (props: { setName: (name: string) => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
 
-    const submit = async (e: SyntheticEvent) => {
+    const login_submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        const response = await fetch('http://localhost:8000/api/user/login', {
+        const response = await fetch('http://127.0.0.1:8000/api/user/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
@@ -30,7 +30,7 @@ const Login = (props: { setName: (name: string) => void }) => {
     }
 
     return (
-        <form onSubmit={submit}>
+        <form onSubmit={login_submit}>
             <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
             <input type="email" className="form-control" placeholder="Email address" required
                    onChange={e => setEmail(e.target.value)}

@@ -29,7 +29,10 @@ const Nav = (props: { name: string, setName: (name: string) => void }) => {
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0">
                 <li className="nav-item active">
-                    <Link to="/login" className="nav-link" onClick={logout}>Logout</Link>
+                    <Link to="/login" onClick={logout}>Logout</Link>
+                </li>
+                <li>
+                    <Link to="/create_group">Create Group</Link>
                 </li>
             </ul>
         )

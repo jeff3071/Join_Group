@@ -6,7 +6,7 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = [
-            'id', 'user', 'starting_time', 'ending_time', 'group_type',
+            'id', 'user', 'starting_time', 'ending_time', 'group_tag',
             'address', 'latitude', 'longitude', 'location'
         ]
 
