@@ -36,7 +36,9 @@ const Home = (props: { name: string }) => {
             }
         };
 
-        fetchData();
+        if (props.name !== '' && props.name !== undefined) {
+            fetchData();
+        }
     }, []);
 
     return (

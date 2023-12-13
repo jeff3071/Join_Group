@@ -5,7 +5,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer
 from .models import User
 import jwt, datetime
-
+from datetime import timedelta
 
 # Create your views here.
 class UserView(GenericAPIView):
@@ -20,7 +20,7 @@ class UserView(GenericAPIView):
     
     def get(self, request):
         token = request.COOKIES.get('jwt')
-
+        
         if not token:
             raise AuthenticationFailed('Unauthenticated!')
 
@@ -70,11 +70,8 @@ class LoginView(GenericAPIView):
 
 class LogoutView(APIView):
     def post(self, request):
-        response = Response()
-        response.delete_cookie('jwt')
-        response.data = {
-            'message': 'success'
-        }
+        response = Response({'message': 'success'})
+        response.delete_cookie('jwt', samesite='None')
         return response
     
     

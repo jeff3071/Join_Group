@@ -4,13 +4,18 @@ import { Nav as Navbar } from '@douyinfe/semi-ui';
 
 const Nav = (props: { name: string, setName: (name: string) => void }) => {
     const logout = async () => {
-        await fetch('http://localhost:8000/api/user/logout', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
-        });
+        try {
+            await fetch('http://localhost:8000/api/user/logout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include',
+            });
+            props.setName('');
 
-        props.setName('');
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+
     }
 
     let menu;
