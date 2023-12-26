@@ -1,37 +1,31 @@
 import React, {SyntheticEvent, useState} from 'react';
 import {Navigate} from "react-router-dom";
-import { TagInput, Input } from '@douyinfe/semi-ui';
+import { TagInput, Input, DatePicker } from '@douyinfe/semi-ui';
+import { create_group, GroupData } from '../api/group';
 
 const Group = (props: { name: string }) => {
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [redirect, setRedirect] = useState(false);
     const [group_type, setGroupType] = useState<Array<string>>([]);
-    const [start_time, setStartTime] = useState('');
-    const [end_time, setEndTime] = useState('');
+    const [start_time, setStartTime] = useState<Date>(new Date());
+    const [end_time, setEndTime] = useState<Date>(new Date());
     const [address, setAddress] = useState('');
     const [group_name, setGrupName] = useState('');
 
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
-
-        const response = await fetch('http://127.0.0.1:8000/api/group/create_group', {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
-            body: JSON.stringify({
-                latitude,
-                longitude,
-                group_type,
-                name: props.name,
-                start_time,
-                end_time,
-                address,
-                group_name
-            })
-        });
-
-        const content = await response.json();
+        const group_data: GroupData = {
+            latitude,
+            longitude,
+            group_type,
+            name: props.name,
+            start_time,
+            end_time,
+            address,
+            group_name
+        };
+        create_group(group_data);
 
         setRedirect(true);
     }
@@ -54,9 +48,21 @@ const Group = (props: { name: string }) => {
             />
 
             <Input className="form-control" placeholder="Address" required
-                   onChange={e => setAddress(e)}
+                    onChange={e => setAddress(e)}
             />
-
+            
+            <DatePicker
+                type="dateTimeRange"
+                placeholder="Select date"
+                onChange={(time: Date | Date[] | string | string[] | undefined) => {
+                    if (Array.isArray(time)) {
+                        if(time[0] instanceof Date && time[1] instanceof Date){
+                            setStartTime(time[0]);
+                            setEndTime(time[1]);
+                        }
+                    }
+                }}
+            />
         </form>
     );
 };

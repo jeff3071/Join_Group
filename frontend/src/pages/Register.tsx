@@ -1,27 +1,13 @@
 import React, {useState} from 'react';
 import {Navigate } from 'react-router-dom';
 import { Form, Button } from '@douyinfe/semi-ui';
+import { RegisterFormValues, user_register } from '../api/user';
 
 const Register = () => {
     const [redirect, setRedirect] = useState(false);
 
-    interface LoginFormValues {
-        name: string;
-        email: string;
-        password: string;
-    }
-
-    const submit = async (values: LoginFormValues) => {
-        const res = await fetch('http://127.0.0.1:8000/api/user/user', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                name: values.name,
-                email: values.email,
-                password: values.password
-            })
-        });
-
+    const submit = async (values: RegisterFormValues) => {
+        user_register(values)
         setRedirect(true);
     }
 

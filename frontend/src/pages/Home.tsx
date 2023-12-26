@@ -1,43 +1,13 @@
 import React, { useState, useEffect } from 'react';
-
-interface Group {
-    id: number;
-    user: number;
-    starting_time: string;
-    ending_time: string;
-    group_type: string;
-    address: string;
-    latitude: number;
-    longitude: number;
-    location: string | null;
-}
+import {list_group, Group} from '../api/group';
 
 const Home = (props: { name: string }) => {
     const [groups, setGroups] = useState<Group[]>([]);
     const [page, setPage] = useState(0);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch('http://127.0.0.1:8000/api/group/list_group', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        page,
-                    }),
-                });
-
-                const data = await response.json();
-                console.log(data);
-                setGroups(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        if (props.name !== '' && props.name !== undefined) {
-            fetchData();
+        if (props.name !== '' && props.name.length !== 0 && groups.length === 0) {
+            list_group(setGroups, page);
         }
     }, []);
 
@@ -55,12 +25,15 @@ const Home = (props: { name: string }) => {
                             <li key={group.id}>
                                 <p>ID: {group.id}</p>
                                 <p>User: {group.user}</p>
-                                <p>Starting Time: {group.starting_time}</p>
-                                <p>Ending Time: {group.ending_time}</p>
+                                {group.starting_time !== null && (
+                                    <p>Starting Time: {new Date(group.starting_time).toLocaleString()}</p>
+                                )}
+                                {group.ending_time !== null && (
+                                    <p>Ending Time: {new Date(group.ending_time).toLocaleString()}</p>
+                                )}
                                 <p>Address: {group.address}</p>
                                 <p>Latitude: {group.latitude}</p>
                                 <p>Longitude: {group.longitude}</p>
-                                <p>Location: {group.location}</p>
                             </li>
                         ))}
                     </ul>

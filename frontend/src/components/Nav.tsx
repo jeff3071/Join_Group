@@ -1,16 +1,15 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import { Nav as Navbar } from '@douyinfe/semi-ui';
+import { user_logout } from '../api/user';
 
 const Nav = (props: { name: string, setName: (name: string) => void }) => {
     const logout = async () => {
         try {
-            await fetch('http://localhost:8000/api/user/logout', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                credentials: 'include',
-            });
+            user_logout();
             props.setName('');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
 
         } catch (error) {
             console.error('Error logging out:', error);
@@ -19,7 +18,6 @@ const Nav = (props: { name: string, setName: (name: string) => void }) => {
     }
 
     let menu;
-    console.log(props.name);
 
     if (props.name === '' || props.name === undefined) {
         menu = (

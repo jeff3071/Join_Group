@@ -1,32 +1,19 @@
 import React, {useState} from 'react';
 import {Navigate} from "react-router-dom";
 import { Form, Button } from '@douyinfe/semi-ui';
+import { user_login, LoginFormValues } from '../api/user';
 
 const Login = (props: { setName: (name: string) => void }) => {
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
 
-    interface LoginFormValues {
-        email: string;
-        password: string;
-    }
-
     const login_submit = async (values: LoginFormValues) => {
-        const response = await fetch('http://127.0.0.1:8000/api/user/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            credentials: 'include',
-            body: JSON.stringify({
-                email: values.email,
-                password: values.password
-            })
-        });
+        const content = await user_login(values);
 
-        const content = await response.json();
-
+        localStorage.setItem('accessToken', content.access_token);
+        localStorage.setItem('refreshToken', content.refresh_token);
+        
+        props.setName(values.email);
         setRedirect(true);
-        props.setName(content.name);
     }
 
     if (redirect) {

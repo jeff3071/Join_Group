@@ -6,6 +6,7 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Group from "./pages/Group";
+import {user_get} from "./api/user";
 
 function App() {
     const [name, setName] = useState('');
@@ -13,14 +14,20 @@ function App() {
     useEffect(() => {
         (
             async () => {
-                const response = await fetch('http://127.0.0.1:8000/api/user/user', {
-                    method: 'GET',
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'include',
-                });
+                if(name.length === 0 || name === undefined) {
+                    const accessToken = localStorage.getItem('accessToken');
 
-                const content = await response.json();
-                setName(content.name);
+                    if(accessToken !== null) {
+                        const content = await user_get();
+
+                        if (content.email !== undefined) {
+                            setName(content.email);
+                        } else {
+                            localStorage.removeItem('accessToken');
+                            localStorage.removeItem('refreshToken');
+                        }
+                    }
+                }
             }
         )();
     });

@@ -1,85 +1,96 @@
+from django.contrib.auth import authenticate
+from django.conf import settings
+from django.middleware import csrf
+from rest_framework import exceptions as rest_exceptions, response, decorators as rest_decorators, permissions as rest_permissions
+from rest_framework_simplejwt import tokens
+from users import serializers, models
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.generics import GenericAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer
-from .models import User
-import jwt, datetime
-from datetime import timedelta
 
-# Create your views here.
+
+def get_user_tokens(user):
+    refresh = tokens.RefreshToken.for_user(user)
+    return {
+        "refresh_token": str(refresh),
+        "access_token": str(refresh.access_token)
+    }
+
+
+@rest_decorators.api_view(["POST"])
+@rest_decorators.permission_classes([])
+def loginView(request):
+    serializer = serializers.LoginSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    email = serializer.validated_data["email"]
+    password = serializer.validated_data["password"]
+
+    user = authenticate(email=email, password=password)
+
+    if user is not None:
+        tokens = get_user_tokens(user)
+        res = response.Response()
+        res.set_cookie(
+            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+            value=tokens["access_token"],
+            expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+        )
+
+        res.set_cookie(
+            key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
+            value=tokens["refresh_token"],
+            expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
+            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+        )
+
+        res.data = tokens
+        return res
+    raise rest_exceptions.AuthenticationFailed(
+        "Email or Password is incorrect!")
+
+
+@rest_decorators.api_view(["POST"])
+@rest_decorators.permission_classes([])
+def registerView(request):
+    serializer = serializers.RegistrationSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    user = serializer.save()
+
+    if user is not None:
+        return response.Response("Registered!")
+    return rest_exceptions.AuthenticationFailed("Invalid credentials!")
+
+
+@rest_decorators.api_view(['POST'])
+@rest_decorators.permission_classes([rest_permissions.IsAuthenticated])
+def logoutView(request):
+    try:
+        refreshToken = request.COOKIES.get(
+            settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+        token = tokens.RefreshToken(refreshToken)
+        token.blacklist()
+
+        res = response.Response()
+        res.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
+        res.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
+
+        return res
+    except:
+        raise rest_exceptions.ParseError("Invalid token")
+
+
 class UserView(GenericAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    
     def get(self, request):
-        token = request.COOKIES.get('jwt')
-        
-        if not token:
-            raise AuthenticationFailed('Unauthenticated!')
-
         try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
+            user = models.User.objects.get(id=request.user.id)
+        except models.User.DoesNotExist:
+            return response.Response(status_code=404)
 
-        user = User.objects.filter(id=payload['id']).first()
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-
-class LoginView(GenericAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    
-    def post(self, request):
-        email = request.data['email']
-        password = request.data['password']
-
-        user = User.objects.filter(email=email).first()
-
-        if user is None:
-            raise AuthenticationFailed('User not found!')
-
-        if not user.check_password(password):
-            raise AuthenticationFailed('Incorrect password!')
-
-        payload = {
-            'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.utcnow()
-        }
-
-        token = jwt.encode(payload, 'secret', algorithm='HS256')
-
-        response = Response()
-
-        response.set_cookie(key='jwt', value=token, httponly=True)
-        response.data = {
-            'jwt': token,
-            'name': user.name,
-        }
-        return response
-
-
-class LogoutView(APIView):
-    def post(self, request):
-        response = Response({'message': 'success'})
-        response.delete_cookie('jwt', samesite='None')
-        return response
-    
-    
-class listUsersView(GenericAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    
-    def get(self, request):
-        users = User.objects.all()
-        users_data = UserSerializer(users, many=True)
-        return Response(users_data.data)
+        serializer = serializers.UserSerializer(user)
+        return response.Response(serializer.data)
