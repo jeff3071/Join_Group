@@ -91,11 +91,15 @@ class CreateGroupView(GenericAPIView):
         responses={200: GroupSerializer}
     )
     def post(self, request):
+        print(request.data)
+        print(request.data.get('starting_time'))
+        
         latitude = request.data.get('latitude')
         longitude = request.data.get('longitude')
+        
         try:
             name = request.data.get('name')
-            user = User.objects.get(name=name)
+            user = User.objects.get(email=name)
         except:
             return Response(
                 {"error": "User not found."},
@@ -113,10 +117,13 @@ class CreateGroupView(GenericAPIView):
         group_data = {
             'group_name': request.data.get('group_name'),
             'user': user,
-            'starting_time': request.data.get('starting_time'),
-            'ending_time': request.data.get('ending_time'),
+            'starting_time': request.data.get('start_time'),
+            'ending_time': request.data.get('end_time'),
             'address': request.data.get('address'),
             'location': location,
+            'group_description': request.data.get('group_description'),
+            'latitude': latitude,
+            'longitude': longitude,
         }
         new_group = Group.objects.create(**group_data)
         
@@ -146,7 +153,7 @@ class ListGroupView(GenericAPIView):
     )
     def post(self, request):
         page = request.data.get('page')
-        groups = Group.objects.all()[page:page+10]
+        groups = Group.objects.all()[page:page+20]
         groups_data = GroupSerializer(groups, many=True)
         return Response(groups_data.data)
     
