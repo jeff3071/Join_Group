@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('group', '0003_tag_remove_group_group_type_group_group_tag'),
+        ("group", "0003_tag_remove_group_group_type_group_group_tag"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='group',
-            name='group_description',
+            model_name="group",
+            name="group_description",
             field=models.TextField(null=True),
         ),
     ]

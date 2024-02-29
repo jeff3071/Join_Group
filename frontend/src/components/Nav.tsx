@@ -33,7 +33,7 @@ const Nav = (props: { name: string, setName: (name: string) => void }) => {
                         Login: "/login",
                         register: "/register",
                     };
-                    
+
                     return (
                         <Link
                             style={{ textDecoration: "none" }}
@@ -64,7 +64,7 @@ const Nav = (props: { name: string, setName: (name: string) => void }) => {
                         Logout: "/",
                         Create_group: "/Create_group",
                     };
-                    
+
                     return (
                         <Link
                             style={{ textDecoration: "none" }}

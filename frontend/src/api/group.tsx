@@ -8,7 +8,7 @@ export interface UserData {
 export interface GroupData {
     latitude: number;
     longitude: number;
-    group_tag: Array<string>; 
+    group_tag: Array<string>;
     name: string;
     start_time: Date;
     end_time: Date;
@@ -25,7 +25,7 @@ export const list_group = async (setGroups: Dispatch<SetStateAction<GroupData[]>
         const accessToken = localStorage.getItem('accessToken');
         const response = await fetch('http://127.0.0.1:8000/api/group/list_group', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
              },
@@ -37,7 +37,7 @@ export const list_group = async (setGroups: Dispatch<SetStateAction<GroupData[]>
 
         const data = await response.json();
         console.log(data);
-        
+
         setGroups(data);
     } catch (error) {
         console.error('Error fetching data:', error);

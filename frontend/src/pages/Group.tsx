@@ -71,7 +71,7 @@ const Group = (props: { name: string }) => {
                 mymap.remove();
             };
         }
-    }, [redirect]); 
+    }, [redirect]);
 
     if (redirect) {
         return <Navigate to="/"/>;
@@ -92,7 +92,7 @@ const Group = (props: { name: string }) => {
             <Input className="form-control" placeholder="Address" required
                     onChange={e => setAddress(e)}
             />
-            
+
             <DatePicker
                 type="dateTimeRange"
                 placeholder="Select date"

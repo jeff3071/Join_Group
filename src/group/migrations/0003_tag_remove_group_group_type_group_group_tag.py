@@ -6,24 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('group', '0002_group_joiner'),
+        ("group", "0002_group_joiner"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Tag',
+            name="Tag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tag_name', models.CharField(max_length=100)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("tag_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.RemoveField(
-            model_name='group',
-            name='group_type',
+            model_name="group",
+            name="group_type",
         ),
         migrations.AddField(
-            model_name='group',
-            name='group_tag',
-            field=models.ManyToManyField(related_name='group_tag', to='group.tag'),
+            model_name="group",
+            name="group_tag",
+            field=models.ManyToManyField(related_name="group_tag", to="group.tag"),
         ),
     ]

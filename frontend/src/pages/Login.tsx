@@ -11,7 +11,7 @@ const Login = (props: { setName: (name: string) => void }) => {
 
         localStorage.setItem('accessToken', content.access_token);
         localStorage.setItem('refreshToken', content.refresh_token);
-        
+
         props.setName(values.email);
         setRedirect(true);
     }
